@@ -1,5 +1,32 @@
 ## Open source Raspberry Pi C++ library for 16-Channel 12-bit PWM/Servo Driver PCA9685 ##
 
+Path to library:
+/home/pi/rpidmx512-master/lib-pca9685
+
+# download the latest version of the library, say bcm2835-1.xx.tar.gz, then:
+
+wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.58.tar.gz
+tar zxvf bcm2835-1.58.tar.gz
+cd bcm2835-1.58
+./configure
+make
+sudo make check
+sudo make install
+
+cd /home/pi/rpidmx512-master/lib-pca9685
+make -f Makefile.Linux "DEF=-DRASPPI"
+
+Compile and build the examples on Linux Raspbian:
+
+cd /home/pi/rpidmx512-master/lib-pca9685/examples
+make
+
+cd /home/pi/rpidmx512-master/lib-pca9685/examples
+sudo ./servo
+
+cd /home/pi/rpidmx512-master/lib-pca9685/examples && make && sudo ./servo
+cd /home/pi/rpidmx512-master/lib-pca9685/examples && make && sudo ./simple
+
 Successfully tested with :
 
 - Adafruit 16-Channel PWM / Servo HAT for Raspberry Pi - Mini Kit ([https://www.adafruit.com/product/2327](https://www.adafruit.com/product/2327 "Adafruit 16-Channel PWM / Servo HAT for Raspberry Pi - Mini Kit"))
