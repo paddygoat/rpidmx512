@@ -26,11 +26,26 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
-
+#include <iostream> 
 #include "pca9685servo.h"
+using namespace std; 
 
-int main(int argc, char **argv) {
-	if (getuid() != 0) {
+int msleep(unsigned long milisec)   
+{   
+    struct timespec req={0};   
+    time_t sec=(int)(milisec/1000);   
+    milisec=milisec-(sec*1000);   
+    req.tv_sec=sec;   
+    req.tv_nsec=milisec*1000000L;   
+    while(nanosleep(&req,&req)==-1)   
+        continue;   
+    return 1;   
+}   
+
+int main(int argc, char **argv) 
+{
+	if (getuid() != 0) 
+	{
 		fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
 		return -1;
 	}
@@ -42,45 +57,33 @@ int main(int argc, char **argv) {
 	servo.SetRightUs(2400);
 
 	servo.Dump();
-
-	puts("");
+	printf("Starting ......");
+    printf("\n");
 
 	servo.SetAngle(CHANNEL(0), ANGLE(90));
 	servo.SetAngle(CHANNEL(1), ANGLE(90));
-	servo.SetAngle(CHANNEL(2), ANGLE(90));
-	servo.SetAngle(CHANNEL(3), ANGLE(90));
 
-	puts("Servo 0:90  Servo 1:90");
-	puts("Servo 2:90  Servo 3:90");
 
-	sleep(4);
+	sleep(1);
 
-	for (;;) {
-		servo.SetAngle(CHANNEL(0), ANGLE(90));
-		servo.SetAngle(CHANNEL(1), ANGLE(0));
-		servo.SetAngle(CHANNEL(2), ANGLE(0));
-		servo.SetAngle(CHANNEL(3), ANGLE(0));
-		puts("");
-		puts("Servo 0:90  Servo 1:0");
-		puts("Servo 2:0  Servo 3:0");
-		sleep(2);
-		servo.SetAngle(CHANNEL(0), ANGLE(180));
-		servo.SetAngle(CHANNEL(1), ANGLE(180));
-		servo.SetAngle(CHANNEL(2), ANGLE(90));
-		servo.SetAngle(CHANNEL(3), ANGLE(90));
-		puts("");
-		puts("Servo 0:180 Servo 1:180");
-		puts("Servo 2:90  Servo 3:90");
-		sleep(2);
-		servo.SetAngle(CHANNEL(0), ANGLE(0));
-		servo.SetAngle(CHANNEL(1), ANGLE(90));
-		servo.SetAngle(CHANNEL(2), ANGLE(180));
-		servo.SetAngle(CHANNEL(3), ANGLE(180));
-		puts("");
-		puts("Servo 0:0   Servo 1:90");
-		puts("Servo 2:180  Servo 3:180");
-		sleep(2);
-	}
+
+		for(int x =90; x<140; x++)
+		{
+		  servo.SetAngle(CHANNEL(0), ANGLE(x));
+		  servo.SetAngle(CHANNEL(1), ANGLE(x));
+          printf("Angle: %i", x);
+          printf("\n");
+		  msleep(200); 
+	    }
+	    
+		for(int x =140; x>90; x--)
+		{
+		  servo.SetAngle(CHANNEL(0), ANGLE(x));
+		  servo.SetAngle(CHANNEL(1), ANGLE(x));
+          printf("Angle: %i", x);
+          printf("\n");
+		  msleep(200);
+	    }
 
 	return 0;
 }

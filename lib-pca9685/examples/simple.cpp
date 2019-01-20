@@ -26,11 +26,25 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <iostream> 
 
 #include "pca9685.h"
+using namespace std; 
+int msleep(unsigned long milisec)   
+{   
+    struct timespec req={0};   
+    time_t sec=(int)(milisec/1000);   
+    milisec=milisec-(sec*1000);   
+    req.tv_sec=sec;   
+    req.tv_nsec=milisec*1000000L;   
+    while(nanosleep(&req,&req)==-1)   
+        continue;   
+    return 1;   
+}   
 
 int main(int argc, char **argv) {
-	if (getuid() != 0) {
+	if (getuid() != 0) 
+	{
 		fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
 		return -1;
 	}
@@ -39,15 +53,41 @@ int main(int argc, char **argv) {
 	PCA9685 pca9685;
 
 	pca9685.Dump();
-
 	pca9685.SetFrequency(100);
 
-	pca9685.SetFullOn(CHANNEL(0), true); 					// Channel 0 Full On
-
-	pca9685.Write(CHANNEL(1), VALUE(PCA9685_VALUE_MAX/2));	// Channel 1, Duty Cycle = 50 %
-	pca9685.Write(CHANNEL(2), VALUE(819)); 					// Channel 2, Duty Cycle = 20 %
+	//pca9685.SetFullOn(CHANNEL(0), true); 					// Channel 0 Full On
+	//pca9685.Write(CHANNEL(1), VALUE(PCA9685_VALUE_MAX/2));	// Channel 1, Duty Cycle = 50 %
+	
+	int a = 450;                                            // Laser points upwards.
+	int b = 900;   // b must be greater than a.
+	int c = 5;
+	int x = 500;
+	
+	pca9685.Write(CHANNEL(0), VALUE(a)); 					// Channel 2, Duty Cycle = 20 %
 															// Max value = 4096. 20 % = 819.2 ~ 819 counts
-	pca9685.SetFullOff(CHANNEL(3), true); 					// Channel 0 Full Off
+	//pca9685.SetFullOff(CHANNEL(3), true); 					// Channel 0 Full Off
+	
+for(int d=c; d>0; d--)
+  {
+	for(x =b; x>a; x--)
+	{
+	  pca9685.Write(CHANNEL(0), VALUE(x));                  // Up and down
+	  pca9685.Write(CHANNEL(1), VALUE(x));
+	  printf("Value d: %i", d);
+      printf(" Value x: %i", x);
+      printf("\n");
+	  msleep(50);
+	}	
+	for(x =a; x<b; x++)
+	{
+	  pca9685.Write(CHANNEL(0), VALUE(x));
+	  pca9685.Write(CHANNEL(1), VALUE(x));
+	  printf("Value d: %i", d);
+      printf(" Value x: %i", x);
+      printf("\n");
+	  msleep(50);
+	}
+  }	
 
 	pca9685.Dump();
 
@@ -65,9 +105,10 @@ int main(int argc, char **argv) {
 	pca9685.Read(CHANNEL(3), &OnValue, &OffValue);
 	printf("\tChannel 3: %04xh-%04xh, Full Off\n", OnValue, OffValue);
 
-	for(;;) {
+	//for(;;) 
+	//{
 
-	}
+	//}
 
 	return 0;
 }
